@@ -18,27 +18,80 @@ def itemise_fit(fit: list) -> list:
     :return: itemised list for fit
     '''
 
-    itemised_fit = None
+    shipname = get_ship_type(fit) + " 1"
+    t2_components_list = [line.replace('\n', '') for line in get_t2_components(fit)]
+    t1_components_list = [line.replace('\n', '') for line in get_t1_components(fit)]
+    other_comps = [line.replace('\n', '') for line in get_anyothercomponents(fit)]
+
+    itemised_fit = []
+    itemised_fit.append(shipname)
+    itemised_fit.extend(t2_components_list)
+    itemised_fit.extend(t1_components_list)
+    itemised_fit.extend(other_comps)
     return itemised_fit
 
 def get_fit_name(fit: list) -> str:
     matches = []
-    for line in open_fit(fit):
+    for line in fit:
         if len(re.findall(r"(\w+])", line)) > 0:
             matches.append(re.findall(r"(\| \w+])", line))
     if len(matches) is 1:
         name = matches[0][0][2:-1]
     return name
 
-def get_ship_type(fit:list) -> str:
-    ship_name = "rifter"
-    return ship_name
+
+def get_ship_type(fit: list) -> str:
+    matches = []
+    name = "Error"
+    for line in fit:
+        if len(re.findall(r"(\[\w+)", line)) > 0:
+            matches.append(re.findall(r"(\[\w+)", line))
+    if len(matches) is 1:
+        name = matches[0][0][1:]
+    return name
 
 def get_t2_components(fit:list) -> list:
-    pass
+    mod_dict = get_components_by_str(fit, " II\n")
+    finallist = []
+    for key in mod_dict:
+        finallist.append("{} {}".format(key.rstrip(), mod_dict[key]))
+    return finallist
+
 
 def get_t1_components(fit:list) -> list:
-    pass
+    mod_dict = get_components_by_str(fit, " I\n")
+    finallist = []
+    for key in mod_dict:
+        finallist.append("{} {}".format(key.rstrip(), mod_dict[key]))
+    return finallist
 
 def get_anyothercomponents(fit:list) -> list:
-    pass
+    mod_dict = {}
+    fit.pop(0)  # don't need the name, we already have it!
+    for line in fit:
+        if not " I\n" in line[1:] and not " II\n" in line[1:] and line is not '\n':
+            if line in mod_dict.keys():
+                mod_dict[line] += 1
+            else:
+                mod_dict[line] = 1
+    finallist = []
+    for key in mod_dict:
+        finallist.append("{} {}".format(key.rstrip(), mod_dict[key]))
+    return finallist
+
+
+def get_components_by_str(fit: list, search_str: str) -> dict:
+    '''
+    Filters components by string, useful for getting t2,t1 (II,I) components
+    :param fit:
+    :param search_str:
+    :return:
+    '''
+    mod_dict = {}
+    for line in fit:
+        if search_str in line:
+            if line in mod_dict.keys():
+                mod_dict[line] += 1
+            else:
+                mod_dict[line] = 1
+    return mod_dict

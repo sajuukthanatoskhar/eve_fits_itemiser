@@ -1,14 +1,18 @@
 import pytest
+
 import fit_translator
 
 '''
 This tests the ability of the fit_translator python file
 '''
+
+
 @pytest.fixture()
-def get_test_fit_file() -> list:
+def get_test_fit_file() -> str:
     test_fit_file = './fits/unittest_hyenafit.fit'
 
     return test_fit_file
+
 
 def test_open_fit(get_test_fit_file):
     fitfile = fit_translator.open_fit(get_test_fit_file)
@@ -33,21 +37,63 @@ def test_open_fit(get_test_fit_file):
 
 
 def test_itemise_fit(get_test_fit_file):
-    fitfile = fit_translator.open_fit(get_test_fit_file)
-
-
+    fitfile = fit_translator.itemise_fit(open(get_test_fit_file, 'r').readlines())
+    errors = []
     successful_itemised_fit = ["Hyena 1\n",
                                "Signal Amplifier II 2\n",
                                "Signal Amplifier I 1\n",
                                "5MN Quad LiF Restrained Microwarpdrive 1\n",
                                "IFFA Compact Damage Control 1"]
 
-    assert successful_itemised_fit == fit_translator.itemise_fit(fitfile)
+    for line in successful_itemised_fit:
+        if line.rstrip() not in fitfile:
+            errors.append("{} not in fit!".format(line))
+
+    assert not errors, "errors occured:\n{}".format("\n".join(errors))
 
 def test_get_ship_type(get_test_fit_file):
-    shipname = fit_translator.get_ship_type(get_test_fit_file)
-    assert shipname is "Hyena"
+    shipname = fit_translator.get_ship_type(open(get_test_fit_file, 'r').readlines())
+    assert shipname == "Hyena"
+
 
 def test_get_fit_name(get_test_fit_file):
-    fitname = fit_translator.get_fit_name(get_test_fit_file)
+    fitname = fit_translator.get_fit_name(open(get_test_fit_file, 'r').readlines())
     assert fitname == "HyenaUnitTest"
+
+
+def test_get_t2_component(get_test_fit_file):
+    fitlist = open(get_test_fit_file).readlines()
+
+    # fit_translator.get_t2_components(fitlist)
+
+    fit_translator.check_if_any_t2_comp_exists(fit_translator.get_t2_components(fitlist))
+
+    assert True
+
+
+def test_get_t1_component(get_test_fit_file):
+    fitlist = open(get_test_fit_file, 'r').readlines()
+    listfinal = fit_translator.get_t1_components(fitlist)
+    errors = []
+    expected_list = ["Signal Amplifier I 1"]
+
+    for line in listfinal:
+        if line.rstrip() not in expected_list:
+            errors.append("{} not in fit!".format(line))
+
+    assert not errors, "errors occured:\n{}".format("\n".join(errors))
+
+
+def test_get_t2_component(get_test_fit_file):
+    fitlist = open(get_test_fit_file).readlines()
+    errors = []
+    # fit_translator.get_t2_components(fitlist)
+    finallist = fit_translator.get_t2_components(fitlist)
+
+    expected_list = ["Signal Amplifier II 2"]
+
+    for line in finallist:
+        if line.rstrip() not in expected_list:
+            errors.append("{} not in fit!".format(line))
+
+    assert not errors, "errors occured:\n{}".format("\n".join(errors))
