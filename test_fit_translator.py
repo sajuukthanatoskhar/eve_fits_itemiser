@@ -37,7 +37,7 @@ def test_open_fit(get_test_fit_file):
 
 
 def test_itemise_fit(get_test_fit_file):
-    fitfile = fit_translator.itemise_fit(open(get_test_fit_file, 'r').readlines())
+    fitfile = fit_translator.itemise_fit(open(get_test_fit_file, 'r').readlines(), 1)
     errors = []
     successful_itemised_fit = ["Hyena 1\n",
                                "Signal Amplifier II 2\n",
@@ -51,6 +51,7 @@ def test_itemise_fit(get_test_fit_file):
 
     assert not errors, "errors occured:\n{}".format("\n".join(errors))
 
+
 def test_get_ship_type(get_test_fit_file):
     shipname = fit_translator.get_ship_type(open(get_test_fit_file, 'r').readlines())
     assert shipname == "Hyena"
@@ -61,19 +62,19 @@ def test_get_fit_name(get_test_fit_file):
     assert fitname == "HyenaUnitTest"
 
 
-def test_get_t2_component(get_test_fit_file):
-    fitlist = open(get_test_fit_file).readlines()
-
-    # fit_translator.get_t2_components(fitlist)
-
-    fit_translator.check_if_any_t2_comp_exists(fit_translator.get_t2_components(fitlist))
-
-    assert True
+# def test_get_t2_component(get_test_fit_file):
+#     fitlist = open(get_test_fit_file).readlines()
+#
+#     # fit_translator.get_t2_components(fitlist)
+#
+#     fit_translator.check_if_any_t2_comp_exists(fit_translator.get_t2_components(fitlist))
+#
+#     assert True
 
 
 def test_get_t1_component(get_test_fit_file):
     fitlist = open(get_test_fit_file, 'r').readlines()
-    listfinal = fit_translator.get_t1_components(fitlist)
+    listfinal = fit_translator.get_t1_components(fitlist, 1)
     errors = []
     expected_list = ["Signal Amplifier I 1"]
 
@@ -88,7 +89,7 @@ def test_get_t2_component(get_test_fit_file):
     fitlist = open(get_test_fit_file).readlines()
     errors = []
     # fit_translator.get_t2_components(fitlist)
-    finallist = fit_translator.get_t2_components(fitlist)
+    finallist = fit_translator.get_t2_components(fitlist, 1)
 
     expected_list = ["Signal Amplifier II 2"]
 
@@ -97,3 +98,12 @@ def test_get_t2_component(get_test_fit_file):
             errors.append("{} not in fit!".format(line))
 
     assert not errors, "errors occured:\n{}".format("\n".join(errors))
+
+
+def test_get_order(get_test_fit_file):
+    errors = []
+    fitlist = open(get_test_fit_file).readlines()
+
+    fit_translator.get_order(fitlist, 1)
+
+    assert not errors, "errors occured: \n{}".format("\n".join(errors))
