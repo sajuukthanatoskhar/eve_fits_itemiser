@@ -101,9 +101,15 @@ def test_get_t2_component(get_test_fit_file):
 
 
 def test_get_order(get_test_fit_file):
+    '''
+
+    :param get_test_fit_file:
+    :return:
+    '''
     errors = []
     fitlist = open(get_test_fit_file).readlines()
 
     fit_translator.get_order(fitlist, 1)
+
 
     assert not errors, "errors occured: \n{}".format("\n".join(errors))

@@ -12,16 +12,25 @@ def open_fit(file: str) -> list:
 
 
 def itemise_fit(fit: list, qty) -> list:
+    '''
+    Gets an itemised fit
+    :param fit:
+    :param qty:
+    :return:
+    '''
     shipname = get_ship_type(fit) + " {}".format(qty * 1)
     t2_components_list = [line.replace('\n', '') for line in get_t2_components(fit, qty)]
     t1_components_list = [line.replace('\n', '') for line in get_t1_components(fit, qty)]
     other_comps = [line.replace('\n', '') for line in get_anyothercomponents(fit, qty)]
+    charges = [line.replace('\n', '') for line in get_charges(fit, qty)]  # todo
 
     itemised_fit = []
     itemised_fit.append(shipname)
     itemised_fit.extend(t2_components_list)
     itemised_fit.extend(t1_components_list)
     itemised_fit.extend(other_comps)
+    itemised_fit.extend(charges)
+
     return itemised_fit
 
 def get_fit_name(fit: list) -> str:
@@ -93,12 +102,27 @@ def get_components_by_str(fit: list, search_str: str, qty: float) -> dict:
     return mod_dict
 
 
-def get_order(fit: list, qty: float):
+def get_charges(fit: list, qty: float):
+    "(\w\d+$)"
+
+    return fit
+
+
+def get_order(fitlist: list):
     '''
-    Gets fit specific total number of mods and ammo required
-    :param fit:
-    :param qty:
-    :return:
+    Gets fit specific total number of mods and ammo required for all from a list of fits
+    :param fitlist: is a list of fits with quantity '<harpyfit location>.fit qty'
+    :return: total order of modules and ships required
     '''
     finalorder_list = []
+
+    for line in fitlist:
+        qty = line.split(' ')[1]
+        finalorder_list.extend(itemise_fit(line.split(' ')[0], line.split(' ')[1]))
+
+
     return finalorder_list
+
+
+def get_total_order(orderlist: list):
+    pass
