@@ -49,7 +49,7 @@ def get_ship_type(fit: list) -> str:
     for line in fit:
         if len(re.findall(r"(\[\w+)", line)) > 0:
             matches.append(re.findall(r"(\[\w+)", line))
-    if len(matches) is 1:
+    if len(matches) > 0:
         name = matches[0][0][1:]
     return name
 
@@ -72,9 +72,11 @@ def get_t1_components(fit: list, qty: float) -> list:
 
 def get_anyothercomponents(fit: list, qty: float) -> list:
     mod_dict = {}
+    qty = int(qty)
     fit.pop(0)  # don't need the name, we already have it!
     for line in fit:
-        if not " I\n" in line[1:] and not " II\n" in line[1:] and line is not '\n':
+        if not " I\n" in line[1:] and not " II\n" in line[1:] and "slot]" not in line and line is not '\n' and len(
+                re.findall(r" x\d+$", line)) == 0:
             if line in mod_dict.keys():
                 mod_dict[line] += 1 * qty
             else:
@@ -93,6 +95,7 @@ def get_components_by_str(fit: list, search_str: str, qty: float) -> dict:
     :return:
     '''
     mod_dict = {}
+    qty = int(qty)
     for line in fit:
         if search_str in line:
             if line in mod_dict.keys():
@@ -102,27 +105,55 @@ def get_components_by_str(fit: list, search_str: str, qty: float) -> dict:
     return mod_dict
 
 
-def get_charges(fit: list, qty: float):
-    "(\w\d+$)"
+def get_charges(fit: list, qty: float) -> list:
+    mod_dict = {}
+    finallist = []
+    qty = int(qty)
+    for line in fit:
 
-    return fit
+        if line != "\n" and "slot]" not in line and len(re.findall(r" \w\d+$", line)) > 0:
+            line = re.split(r"( \w\d+$)", line, 2)  # for charges
+            if line[0] in mod_dict.keys():
+                mod_dict[line[0]] += int(line[1][2:]) * qty
+            else:
+                mod_dict[line[0]] = int(line[1][2:]) * qty
+    for key in mod_dict:
+        finallist.append("{} {}".format(key.rstrip(), mod_dict[key]))
+    return finallist
 
 
-def get_order(fitlist: list):
+def get_order(orderlist: list):
     '''
     Gets fit specific total number of mods and ammo required for all from a list of fits
     :param fitlist: is a list of fits with quantity '<harpyfit location>.fit qty'
-    :return: total order of modules and ships required
+    :return: total order of modules and ships required, these ARE NOT collated
     '''
     finalorder_list = []
 
-    for line in fitlist:
+    for line in orderlist:
         qty = line.split(' ')[1]
-        finalorder_list.extend(itemise_fit(line.split(' ')[0], line.split(' ')[1]))
+        fitlist = open(line.split(' ')[0], 'r').readlines()
+        finalorder_list.extend(itemise_fit(fitlist, int(qty)))
 
 
     return finalorder_list
 
 
 def get_total_order(orderlist: list):
-    pass
+    '''
+    Collate the order
+    :param orderlist:
+    :return:
+    '''
+    mod_dict = {}
+    finallist = []
+    for line in orderlist:
+        modline = re.split(r"( \d+$)", line, 2)
+        if modline[0] in mod_dict.keys():
+            mod_dict[modline[0]] += int(modline[1][1:])
+        else:
+            mod_dict[modline[0]] = int(modline[1][1:])
+    for key in mod_dict:
+        finallist.append("{} {}".format(key.rstrip(), mod_dict[key]))
+
+    return finallist

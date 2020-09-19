@@ -14,6 +14,11 @@ def get_test_fit_file() -> str:
     return test_fit_file
 
 
+@pytest.fixture()
+def get_test_order_file() -> str:
+    test_order_file = './orderlist.order'
+    return test_order_file
+
 def test_open_fit(get_test_fit_file):
     fitfile = fit_translator.open_fit(get_test_fit_file)
     errors = []
@@ -100,16 +105,26 @@ def test_get_t2_component(get_test_fit_file):
     assert not errors, "errors occured:\n{}".format("\n".join(errors))
 
 
-def test_get_order(get_test_fit_file):
-    '''
-
-    :param get_test_fit_file:
-    :return:
-    '''
+def test_get_charges(get_test_fit_file):
     errors = []
-    fitlist = open(get_test_fit_file).readlines()
+    expected_list = []
+    finallist = fit_translator.get_charges(open(get_test_fit_file, 'r').readlines(), 1)
+    for line in finallist:
+        if line.rstrip() not in expected_list:
+            errors.append("{} not in fit!".format(line))
 
-    fit_translator.get_order(fitlist, 1)
+    assert not errors, "errors occured: \n{}".format("\n".join(errors))
 
+
+def test_get_order(get_test_order_file):
+    errors = []
+    expected_list = []
+    fitlist = open(get_test_order_file).readlines()
+    finallist = fit_translator.get_order(fitlist)
+
+    orderlist = fit_translator.get_total_order(finallist)
+    for line in orderlist:
+        if line.rstrip() not in expected_list:
+            errors.append("{} not in fit!".format(line))
 
     assert not errors, "errors occured: \n{}".format("\n".join(errors))
