@@ -118,7 +118,17 @@ def test_get_charges(get_test_fit_file):
 
 def test_get_order(get_test_order_file):
     errors = []
-    expected_list = []
+    expected_list = ["Hyena 2",
+                     "Signal Amplifier II 4",
+                     "Small Core Defense Field Extender II 2",
+                     "Signal Amplifier I 2",
+                     "IFFA Compact Damage Control 2",
+                     "5MN Quad LiF Restrained Microwarpdrive 2",
+                     "Nanite Repair Paste 60",
+                     "Multispectrum Shield Hardener II 2",
+                     "Damage Control II 2",
+                     "Damage Control I 2",
+                     "Republic Fleet Titanium Sabot S 480"]
     fitlist = open(get_test_order_file).readlines()
     finallist = fit_translator.get_order(fitlist)
 

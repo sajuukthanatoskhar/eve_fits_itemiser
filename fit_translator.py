@@ -128,32 +128,40 @@ def get_order(orderlist: list):
     :param fitlist: is a list of fits with quantity '<harpyfit location>.fit qty'
     :return: total order of modules and ships required, these ARE NOT collated
     '''
-    finalorder_list = []
+    uncollated_order = []
 
     for line in orderlist:
-        qty = line.split(' ')[1]
-        fitlist = open(line.split(' ')[0], 'r').readlines()
-        finalorder_list.extend(itemise_fit(fitlist, int(qty)))
+        if line != '\n':
+            qty = line.split(' ')[1]
+            fitlist = open(line.split(' ')[0], 'r').readlines()
+            uncollated_order.extend(itemise_fit(fitlist, int(qty)))
+
+    return uncollated_order
 
 
-    return finalorder_list
-
-
-def get_total_order(orderlist: list):
+def get_total_order(uncollatedorder: list):
     '''
     Collate the order
-    :param orderlist:
+    :param uncollatedorder:
     :return:
     '''
     mod_dict = {}
-    finallist = []
-    for line in orderlist:
+    collated_order = []
+    for line in uncollatedorder:
         modline = re.split(r"( \d+$)", line, 2)
         if modline[0] in mod_dict.keys():
             mod_dict[modline[0]] += int(modline[1][1:])
         else:
             mod_dict[modline[0]] = int(modline[1][1:])
     for key in mod_dict:
-        finallist.append("{} {}".format(key.rstrip(), mod_dict[key]))
+        collated_order.append("{} {}".format(key.rstrip(), mod_dict[key]))
 
-    return finallist
+    return collated_order
+
+
+def write_total_order_to_file(collated_order, filename):
+    orderfile = open("{}.order".format(filename), 'w')
+    for line in collated_order:
+        orderfile.write(line + "\n")
+    orderfile.close()
+    return 1
