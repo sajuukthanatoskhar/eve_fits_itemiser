@@ -18,14 +18,16 @@ def itemise_fit(fit: list, qty) -> list:
     :param qty:
     :return:
     '''
-    shipname = get_ship_type(fit) + " {}".format(qty * 1)
+    itemised_fit = []
+
+    if qty != 0:
+        shipname = get_ship_type(fit) + " {}".format(qty * 1)
+        itemised_fit.append(shipname)
     t2_components_list = [line.replace('\n', '') for line in get_t2_components(fit, qty)]
     t1_components_list = [line.replace('\n', '') for line in get_t1_components(fit, qty)]
     other_comps = [line.replace('\n', '') for line in get_anyothercomponents(fit, qty)]
     charges = [line.replace('\n', '') for line in get_charges(fit, qty)]  # todo
 
-    itemised_fit = []
-    itemised_fit.append(shipname)
     itemised_fit.extend(t2_components_list)
     itemised_fit.extend(t1_components_list)
     itemised_fit.extend(other_comps)
@@ -58,6 +60,8 @@ def get_t2_components(fit: list, qty: float) -> list:
     mod_dict = get_components_by_str(fit, " II\n", qty)
     finallist = []
     for key in mod_dict:
+        if mod_dict[key] == 0:
+            continue
         finallist.append("{} {}".format(key.rstrip(), mod_dict[key]))
     return finallist
 
@@ -66,6 +70,8 @@ def get_t1_components(fit: list, qty: float) -> list:
     mod_dict = get_components_by_str(fit, " I\n", qty)
     finallist = []
     for key in mod_dict:
+        if mod_dict[key] == 0:
+            continue
         finallist.append("{} {}".format(key.rstrip(), mod_dict[key]))
     return finallist
 
@@ -83,6 +89,8 @@ def get_anyothercomponents(fit: list, qty: float) -> list:
                 mod_dict[line] = 1 * qty
     finallist = []
     for key in mod_dict:
+        if mod_dict[key] == 0:
+            continue
         finallist.append("{} {}".format(key.rstrip(), mod_dict[key]))
     return finallist
 
@@ -118,6 +126,8 @@ def get_charges(fit: list, qty: float) -> list:
             else:
                 mod_dict[line[0]] = int(line[1][2:]) * qty
     for key in mod_dict:
+        if mod_dict[key] == 0:
+            continue
         finallist.append("{} {}".format(key.rstrip(), mod_dict[key]))
     return finallist
 
