@@ -143,7 +143,8 @@ def get_order(orderlist: list):
     for line in orderlist:
         if line != '\n':
             qty = line.split(' ')[1]
-            fitlist = open(line.split(' ')[0], 'r').readlines()
+            name = "./fits/" + line.split(' ')[0]
+            fitlist = open(name, 'r').readlines()
             uncollated_order.extend(itemise_fit(fitlist, int(qty)))
 
     return uncollated_order
