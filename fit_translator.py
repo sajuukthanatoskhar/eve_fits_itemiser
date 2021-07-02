@@ -1,5 +1,6 @@
 import re
 
+
 def open_fit(file: str) -> list:
     '''
 
@@ -9,6 +10,19 @@ def open_fit(file: str) -> list:
     fit_file = open(file, 'r')
     file_list = fit_file.readlines()
     return file_list
+
+
+def split_item_qty(eve_item: str) -> [str, int]:
+    """
+    Splits an eve item.  This is aimed at multiple empty space modules and entities.
+    :param eve_item:
+        Example "Tritanium 100"
+                "Test Free Rifter 20"
+    :return: dict, as Montolio intended
+    """
+    item_qty_dict = {}
+
+    return [eve_item.rpartition(" ")[0], int(eve_item.rpartition(" ")[2])]
 
 
 def itemise_fit(fit: list, qty) -> list:
@@ -34,6 +48,7 @@ def itemise_fit(fit: list, qty) -> list:
     itemised_fit.extend(charges)
 
     return itemised_fit
+
 
 def get_fit_name(fit: list) -> str:
     matches = []
