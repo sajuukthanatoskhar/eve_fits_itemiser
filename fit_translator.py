@@ -147,9 +147,37 @@ def get_charges(fit: list, qty: float) -> list:
     return finallist
 
 
+def new_get_fit_name(fit: list) -> str:
+    """
+    Gets the name of a fit from an EFT block
+    :param fit: the fit as a copied EFT fit
+    :return: parsed_fit_name
+    """
+
+    parsed_fit_name :str = fit[0].split(',')[1].lstrip(' ').rstrip(']').replace(" ", "_")
+
+    return parsed_fit_name
+
+
+def make_fit_file(fit: list) -> None:
+    """
+    Makes a fit into a file
+    :param fit:  EFT Fitting block
+    :return: None
+    """
+
+    import os
+    print(os.path.isdir('./Fits'))
+    path = "./Fits/{}.fit".format(new_get_fit_name(fit))
+    output_fit_file = open(path, 'w')
+    for line in fit:
+        output_fit_file.write("{}\n".format(line))
+
+
 def get_order(orderlist: list):
     '''
     Gets fit specific total number of mods and ammo required for all from a list of fits
+    :param orderlist:
     :param fitlist: is a list of fits with quantity '<harpyfit location>.fit qty'
     :return: total order of modules and ships required, these ARE NOT collated
     '''
