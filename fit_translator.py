@@ -219,3 +219,16 @@ def write_total_order_to_file(collated_order, filename):
         orderfile.write(line + "\n")
     orderfile.close()
     return 1
+
+
+def get_all_fits_as_list_str() -> list:
+    """
+    Gets all fits in the Fits dir
+    :return: fits as a list, stripping the .fit out
+    todo : there will be a bug in the actual test, this is unintended and the test needs to be rewritten
+    """
+    import sys,os
+    fits = os.listdir("./Fits/")
+    fits = [new_fit_name.rstrip(".fit") for new_fit_name in fits if ".fit" in new_fit_name]
+
+    return fits
