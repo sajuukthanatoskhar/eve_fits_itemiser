@@ -168,11 +168,13 @@ def make_fit_file(fit: list) -> None:
 
     import os
     print(os.path.isdir('./Fits'))
-    path = "./Fits/{}.fit".format(new_get_fit_name(fit))
-    output_fit_file = open(path, 'w')
-    for line in fit:
-        output_fit_file.write("{}\n".format(line))
-
+    try:
+        path = "./Fits/{}.fit".format(new_get_fit_name(fit))
+        output_fit_file = open(path, 'w')
+        for line in fit:
+            output_fit_file.write("{}\n".format(line))
+    except IndexError:
+        print("Either you pressed cancel or didn't enter anything")
 
 def get_order(orderlist: list):
     '''
