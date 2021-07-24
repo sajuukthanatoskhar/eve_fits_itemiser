@@ -153,9 +153,7 @@ def new_get_fit_name(fit: list) -> str:
     :param fit: the fit as a copied EFT fit
     :return: parsed_fit_name
     """
-
     parsed_fit_name :str = fit[0].split(',')[1].lstrip(' ').rstrip(']').replace(" ", "_")
-
     return parsed_fit_name
 
 
